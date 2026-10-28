@@ -33,815 +33,994 @@
       background: var(--border);
       border-radius: 9999px;
     }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .shake-anim {
+      animation: shake 0.4s ease-in-out;
+    }
   </style>
 </head>
-<body class="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen p-4 sm:p-6 md:p-8">
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen">
 
-  <!-- Header Banner -->
-  <header class="max-w-7xl mx-auto mb-6">
-    <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-      <div>
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-3">
-          <span>🇹🇼 16-Night Island Loop</span>
-          <span>•</span>
-          <span>Nov 13 – Nov 29</span>
-        </div>
-        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">Taiwan Journey Blueprint</h1>
-        <p class="text-[var(--muted-foreground)] text-sm sm:text-base mt-1">
-          A relaxed balance of street food, vibrant cafe culture, urban exploring, and scenic nature.
-        </p>
+  <!-- ================= PIN AUTH SCREEN ================= -->
+  <div id="pin-screen" class="fixed inset-0 z-50 bg-[var(--background)] flex items-center justify-center p-4">
+    <div id="pin-card" class="w-full max-w-sm bg-[var(--card)] border border-[var(--border)] rounded-3xl p-6 sm:p-8 shadow-xl text-center flex flex-col items-center">
+      
+      <!-- Flag / Icon -->
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-3xl mb-4 shadow-sm">
+        🇹🇼
+      </div>
+      
+      <h2 class="text-xl sm:text-2xl font-bold tracking-tight mb-1">Taiwan Trip Planner</h2>
+      <p class="text-xs sm:text-sm text-[var(--muted-foreground)] mb-6">Enter PIN to access your itinerary</p>
+      
+      <!-- 4 PIN Indicator Dots -->
+      <div id="pin-dots" class="flex items-center justify-center gap-4 mb-4">
+        <div id="dot-0" class="w-3.5 h-3.5 rounded-full border-2 border-[var(--border)] transition-all"></div>
+        <div id="dot-1" class="w-3.5 h-3.5 rounded-full border-2 border-[var(--border)] transition-all"></div>
+        <div id="dot-2" class="w-3.5 h-3.5 rounded-full border-2 border-[var(--border)] transition-all"></div>
+        <div id="dot-3" class="w-3.5 h-3.5 rounded-full border-2 border-[var(--border)] transition-all"></div>
       </div>
 
-      <!-- Quick Metrics -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-        <div class="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)]">
-          <div class="text-xl sm:text-2xl font-bold text-amber-500">16</div>
-          <div class="text-xs text-[var(--muted-foreground)]">Nights Total</div>
-        </div>
-        <div class="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)]">
-          <div class="text-xl sm:text-2xl font-bold text-blue-500">5</div>
-          <div class="text-xs text-[var(--muted-foreground)]">Base Hubs</div>
-        </div>
-        <div class="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)]">
-          <div class="text-xl sm:text-2xl font-bold text-emerald-500">↺ Loop</div>
-          <div class="text-xs text-[var(--muted-foreground)]">Counter-Clockwise</div>
-        </div>
-        <div class="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)]">
-          <div class="text-xl sm:text-2xl font-bold text-purple-500">TRA + HSR</div>
-          <div class="text-xs text-[var(--muted-foreground)]">Scenic Trains</div>
-        </div>
-      </div>
-    </div>
-  </header>
+      <!-- Error Message -->
+      <p id="pin-error" class="text-xs text-red-500 font-medium h-5 mb-3 opacity-0 transition-opacity">Incorrect PIN. Try again.</p>
 
-  <!-- Main Grid: Map & Content -->
-  <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-    <!-- Left Column: Interactive Map & Base Quick-Nav (5 cols) -->
-    <div class="lg:col-span-5 flex flex-col gap-6">
-
-      <!-- Map Card -->
-      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm sticky top-6">
-        <div class="flex items-center justify-between mb-3">
-          <div>
-            <h2 class="font-bold text-base sm:text-lg">Interactive Route Map</h2>
-            <p class="text-xs text-[var(--muted-foreground)]">Click any hub to jump to its days</p>
-          </div>
-          <span class="text-xs px-2.5 py-1 bg-[var(--accent)] text-[var(--accent-foreground)] rounded-md font-medium">TRA & HSR Rail</span>
-        </div>
-
-        <div class="relative w-full aspect-[4/5] bg-[var(--background)] border border-[var(--border)] rounded-xl p-2 flex items-center justify-center overflow-hidden">
-          <svg viewBox="0 0 420 580" class="w-full h-full max-h-[500px]" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="taiwanFill" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="currentColor" stop-opacity="0.08"/>
-                <stop offset="100%" stop-color="currentColor" stop-opacity="0.16"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Taiwan Island Outline (Stylized) -->
-            <path d="M 285,45 
-                     C 295,55 310,80 300,105 
-                     C 290,130 280,160 285,210 
-                     C 290,260 280,320 260,390 
-                     C 245,440 220,500 210,540 
-                     C 205,555 195,550 190,535 
-                     C 180,505 160,460 140,410 
-                     C 120,360 100,300 110,230 
-                     C 120,170 140,120 180,80 
-                     C 210,50 240,40 285,45 Z" 
-                  fill="url(#taiwanFill)" 
-                  stroke="currentColor" 
-                  stroke-opacity="0.25" 
-                  stroke-width="2" 
-                  stroke-linejoin="round" />
-
-            <!-- Rail Route Lines -->
-            <!-- Leg 1: Taipei to Hualien (TRA East Coast) -->
-            <path d="M 255,95 Q 295,120 275,205" fill="none" stroke="#3b82f6" stroke-width="3" class="route-line" />
-            
-            <!-- Leg 2: Hualien to Taitung (East Rift Valley) -->
-            <path d="M 275,205 Q 275,290 235,385" fill="none" stroke="#10b981" stroke-width="3" class="route-line" />
-            
-            <!-- Leg 3: Taitung to Kaohsiung (South-Link) -->
-            <path d="M 235,385 Q 200,470 155,420" fill="none" stroke="#f59e0b" stroke-width="3" class="route-line" />
-            
-            <!-- Leg 4: Kaohsiung to Tainan -->
-            <path d="M 155,420 L 138,365" fill="none" stroke="#06b6d4" stroke-width="3" class="route-line" />
-
-            <!-- Leg 5: Tainan to Taipei (High Speed Rail THSR) -->
-            <path d="M 138,365 Q 130,220 255,95" fill="none" stroke="#8b5cf6" stroke-width="3.5" stroke-dasharray="8 4" />
-
-            <!-- Map Nodes -->
-            <!-- 1. Taipei -->
-            <g class="cursor-pointer group" onclick="selectBase('taipei')">
-              <circle cx="255" cy="95" r="14" fill="#8b5cf6" fill-opacity="0.2" class="pulse-pin" />
-              <circle cx="255" cy="95" r="7" fill="#8b5cf6" stroke="#ffffff" stroke-width="2" />
-              <text x="268" y="99" font-size="13" font-weight="bold" fill="currentColor" class="select-none">Taipei</text>
-              <text x="268" y="112" font-size="10" fill="var(--muted-foreground)" class="select-none">Start (3N) & End (3N)</text>
-            </g>
-
-            <!-- 2. Hualien -->
-            <g class="cursor-pointer group" onclick="selectBase('hualien')">
-              <circle cx="275" cy="205" r="12" fill="#3b82f6" fill-opacity="0.2" class="pulse-pin" />
-              <circle cx="275" cy="205" r="6" fill="#3b82f6" stroke="#ffffff" stroke-width="2" />
-              <text x="288" y="208" font-size="12" font-weight="bold" fill="currentColor" class="select-none">Hualien (2N)</text>
-              <text x="288" y="221" font-size="10" fill="var(--muted-foreground)" class="select-none">Pacific Coast</text>
-            </g>
-
-            <!-- 3. Taitung / Chishang -->
-            <g class="cursor-pointer group" onclick="selectBase('taitung')">
-              <circle cx="235" cy="385" r="12" fill="#10b981" fill-opacity="0.2" class="pulse-pin" />
-              <circle cx="235" cy="385" r="6" fill="#10b981" stroke="#ffffff" stroke-width="2" />
-              <text x="248" y="388" font-size="12" font-weight="bold" fill="currentColor" class="select-none">Taitung (3N)</text>
-              <text x="248" y="401" font-size="10" fill="var(--muted-foreground)" class="select-none">Rice Fields & Coast</text>
-            </g>
-
-            <!-- 4. Kaohsiung -->
-            <g class="cursor-pointer group" onclick="selectBase('kaohsiung')">
-              <circle cx="155" cy="420" r="12" fill="#f59e0b" fill-opacity="0.2" class="pulse-pin" />
-              <circle cx="155" cy="420" r="6" fill="#f59e0b" stroke="#ffffff" stroke-width="2" />
-              <text x="75" y="424" font-size="12" font-weight="bold" fill="currentColor" class="select-none">Kaohsiung (2N)</text>
-              <text x="85" y="437" font-size="10" fill="var(--muted-foreground)" class="select-none">Harbor Art</text>
-            </g>
-
-            <!-- 5. Tainan -->
-            <g class="cursor-pointer group" onclick="selectBase('tainan')">
-              <circle cx="138" cy="365" r="12" fill="#06b6d4" fill-opacity="0.2" class="pulse-pin" />
-              <circle cx="138" cy="365" r="6" fill="#06b6d4" stroke="#ffffff" stroke-width="2" />
-              <text x="65" y="368" font-size="12" font-weight="bold" fill="currentColor" class="select-none">Tainan (3N)</text>
-              <text x="65" y="381" font-size="10" fill="var(--muted-foreground)" class="select-none">Food Capital</text>
-            </g>
-          </svg>
-        </div>
-
-        <!-- Legend -->
-        <div class="mt-4 pt-4 border-t border-[var(--border)] flex flex-wrap gap-x-4 gap-y-2 text-xs text-[var(--muted-foreground)]">
-          <div class="flex items-center gap-1.5">
-            <span class="w-3 h-1 bg-[#3b82f6] rounded"></span> <span>TRA Coastal</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-3 h-1 bg-[#10b981] rounded"></span> <span>TRA Rift Valley</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-3 h-1 bg-[#f59e0b] rounded"></span> <span>TRA South-Link</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-3 h-1 bg-[#8b5cf6] rounded border-b border-dashed"></span> <span>THSR High-Speed</span>
-          </div>
-        </div>
+      <!-- Numeric Keypad for Mobile & Touch -->
+      <div class="grid grid-cols-3 gap-2.5 w-full max-w-[260px] mb-4 select-none">
+        <button onclick="pressDigit('1')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">1</button>
+        <button onclick="pressDigit('2')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">2</button>
+        <button onclick="pressDigit('3')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">3</button>
+        <button onclick="pressDigit('4')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">4</button>
+        <button onclick="pressDigit('5')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">5</button>
+        <button onclick="pressDigit('6')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">6</button>
+        <button onclick="pressDigit('7')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">7</button>
+        <button onclick="pressDigit('8')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">8</button>
+        <button onclick="pressDigit('9')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">9</button>
+        <button onclick="clearPin()" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] text-xs font-semibold text-[var(--muted-foreground)] transition active:scale-95">Clear</button>
+        <button onclick="pressDigit('0')" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-lg transition active:scale-95">0</button>
+        <button onclick="deleteDigit()" class="h-12 rounded-xl bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] font-semibold text-base transition active:scale-95">⌫</button>
       </div>
 
-      <!-- Quick Navigation Buttons -->
-      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-sm">
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] mb-3">Jump to Stop</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2 text-xs">
-          <button onclick="selectBase('all')" id="btn-all" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
-            🌟 All 16 Days
-          </button>
-          <button onclick="selectBase('taipei-start')" id="btn-taipei-start" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
-            🏙️ 1. Taipei (D1–3)
-          </button>
-          <button onclick="selectBase('hualien')" id="btn-hualien" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
-            🌊 2. Hualien (D4–5)
-          </button>
-          <button onclick="selectBase('taitung')" id="btn-taitung" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
-            🌾 3. Taitung (D6–8)
-          </button>
-          <button onclick="selectBase('kaohsiung')" id="btn-kaohsiung" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
-            ⚓ 4. Kaohsiung (D9–10)
-          </button>
-          <button onclick="selectBase('tainan')" id="btn-tainan" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
-            🍜 5. Tainan (D11–13)
-          </button>
-          <button onclick="selectBase('taipei-end')" id="btn-taipei-end" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
-            ♨️ 6. Taipei Finale (D14–17)
-          </button>
-        </div>
+      <div class="flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
+        <input type="checkbox" id="remember-me" checked class="rounded border-[var(--border)]">
+        <label for="remember-me" class="cursor-pointer select-none">Remember this device</label>
       </div>
 
     </div>
+  </div>
 
-    <!-- Right Column: Itinerary Feed & Feature Tabs (7 cols) -->
-    <div class="lg:col-span-7 flex flex-col gap-6">
+  <!-- ================= MAIN TRIP CONTENT ================= -->
+  <div id="trip-content" class="hidden p-4 sm:p-6 md:p-8">
 
-      <!-- Sub-Tabs: Itinerary vs Hotels vs Food vs Logistics -->
-      <div class="flex items-center gap-2 p-1 bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-x-auto scrollbar-thin">
-        <button onclick="switchView('itinerary')" id="tab-itinerary" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--accent)] text-[var(--foreground)] transition whitespace-nowrap">
-          📅 Day-by-Day Plan
-        </button>
-        <button onclick="switchView('hotels')" id="tab-hotels" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">
-          🏨 Neighborhoods & Hotels
-        </button>
-        <button onclick="switchView('food')" id="tab-food" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">
-          🍜 Food & Cafe Radar
-        </button>
-        <button onclick="switchView('trains')" id="tab-trains" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">
-          🚄 Train Booking Guide
-        </button>
+    <!-- Header Banner -->
+    <header class="max-w-7xl mx-auto mb-6">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span>🇹🇼 16-Night Island Loop</span>
+              <span>•</span>
+              <span>Nov 13 – Nov 29</span>
+            </span>
+            <button onclick="lockPage()" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)] bg-[var(--background)] transition">
+              🔒 Lock
+            </button>
+          </div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">Taiwan Journey Blueprint</h1>
+          <p class="text-[var(--muted-foreground)] text-sm sm:text-base mt-1">
+            A relaxed balance of street food, vibrant cafe culture, urban exploring, and scenic nature.
+          </p>
+        </div>
+
+        <!-- Quick Metrics -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div class="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)]">
+            <div class="text-xl sm:text-2xl font-bold text-amber-500">16</div>
+            <div class="text-xs text-[var(--muted-foreground)]">Nights Total</div>
+          </div>
+          <div class="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)]">
+            <div class="text-xl sm:text-2xl font-bold text-blue-500">5</div>
+            <div class="text-xs text-[var(--muted-foreground)]">Base Hubs</div>
+          </div>
+          <div class="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)]">
+            <div class="text-xl sm:text-2xl font-bold text-emerald-500">↺ Loop</div>
+            <div class="text-xs text-[var(--muted-foreground)]">Counter-Clockwise</div>
+          </div>
+          <div class="p-3 bg-[var(--background)] rounded-xl border border-[var(--border)]">
+            <div class="text-xl sm:text-2xl font-bold text-purple-500">TRA + HSR</div>
+            <div class="text-xs text-[var(--muted-foreground)]">Scenic Trains</div>
+          </div>
+        </div>
       </div>
+    </header>
 
-      <!-- VIEW 1: ITINERARY -->
-      <div id="view-itinerary" class="flex flex-col gap-4">
+    <!-- Main Grid: Map & Content -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Stop 1: Taipei Arrival -->
-        <div class="day-card" data-stop="taipei-start">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 1</span>
-                <span class="text-sm font-medium">Nov 13 (Thu)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taipei [Booked]</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Arrival</span>
+      <!-- Left Column: Interactive Map & Base Quick-Nav (5 cols) -->
+      <div class="lg:col-span-5 flex flex-col gap-6">
+
+        <!-- Map Card -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm sticky top-6">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="font-bold text-base sm:text-lg">Interactive Route Map</h2>
+              <p class="text-xs text-[var(--muted-foreground)]">Click any hub to jump to its days</p>
             </div>
-            <h4 class="font-bold text-base mb-1">Touchdown Taipei & First Night Bites</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Land at Taoyuan (TPE), take the Airport Express MRT directly to Taipei Main Station, and check in.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-amber-500">Evening:</strong> Relaxed stroll through <strong>Ningxia Night Market</strong>. Try Liu Yu Zi fried taro balls & fresh oyster omelet.</div>
-              <div><strong class="text-blue-500">Transit:</strong> Taoyuan Airport MRT Express (35 mins) — tap EasyCard.</div>
+            <span class="text-xs px-2.5 py-1 bg-[var(--accent)] text-[var(--accent-foreground)] rounded-md font-medium">TRA & HSR Rail</span>
+          </div>
+
+          <div class="relative w-full aspect-[4/5] bg-[var(--background)] border border-[var(--border)] rounded-xl p-2 flex items-center justify-center overflow-hidden">
+            <svg viewBox="0 0 420 580" class="w-full h-full max-h-[500px]" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="taiwanFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="currentColor" stop-opacity="0.08"/>
+                  <stop offset="100%" stop-color="currentColor" stop-opacity="0.16"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Taiwan Island Outline (Stylized) -->
+              <path d="M 285,45 
+                       C 295,55 310,80 300,105 
+                       C 290,130 280,160 285,210 
+                       C 290,260 280,320 260,390 
+                       C 245,440 220,500 210,540 
+                       C 205,555 195,550 190,535 
+                       C 180,505 160,460 140,410 
+                       C 120,360 100,300 110,230 
+                       C 120,170 140,120 180,80 
+                       C 210,50 240,40 285,45 Z" 
+                    fill="url(#taiwanFill)" 
+                    stroke="currentColor" 
+                    stroke-opacity="0.25" 
+                    stroke-width="2" 
+                    stroke-linejoin="round" />
+
+              <!-- Rail Route Lines -->
+              <!-- Leg 1: Taipei to Hualien (TRA East Coast) -->
+              <path d="M 255,95 Q 295,120 275,205" fill="none" stroke="#3b82f6" stroke-width="3" class="route-line" />
+              
+              <!-- Leg 2: Hualien to Taitung (East Rift Valley) -->
+              <path d="M 275,205 Q 275,290 235,385" fill="none" stroke="#10b981" stroke-width="3" class="route-line" />
+              
+              <!-- Leg 3: Taitung to Kaohsiung (South-Link) -->
+              <path d="M 235,385 Q 200,470 155,420" fill="none" stroke="#f59e0b" stroke-width="3" class="route-line" />
+              
+              <!-- Leg 4: Kaohsiung to Tainan -->
+              <path d="M 155,420 L 138,365" fill="none" stroke="#06b6d4" stroke-width="3" class="route-line" />
+
+              <!-- Leg 5: Tainan to Taipei (High Speed Rail THSR) -->
+              <path d="M 138,365 Q 130,220 255,95" fill="none" stroke="#8b5cf6" stroke-width="3.5" stroke-dasharray="8 4" />
+
+              <!-- Map Nodes -->
+              <!-- 1. Taipei -->
+              <g class="cursor-pointer group" onclick="selectBase('taipei')">
+                <circle cx="255" cy="95" r="14" fill="#8b5cf6" fill-opacity="0.2" class="pulse-pin" />
+                <circle cx="255" cy="95" r="7" fill="#8b5cf6" stroke="#ffffff" stroke-width="2" />
+                <text x="268" y="99" font-size="13" font-weight="bold" fill="currentColor" class="select-none">Taipei</text>
+                <text x="268" y="112" font-size="10" fill="var(--muted-foreground)" class="select-none">Start (3N) & End (3N)</text>
+              </g>
+
+              <!-- 2. Hualien -->
+              <g class="cursor-pointer group" onclick="selectBase('hualien')">
+                <circle cx="275" cy="205" r="12" fill="#3b82f6" fill-opacity="0.2" class="pulse-pin" />
+                <circle cx="275" cy="205" r="6" fill="#3b82f6" stroke="#ffffff" stroke-width="2" />
+                <text x="288" y="208" font-size="12" font-weight="bold" fill="currentColor" class="select-none">Hualien (2N)</text>
+                <text x="288" y="221" font-size="10" fill="var(--muted-foreground)" class="select-none">Pacific Coast</text>
+              </g>
+
+              <!-- 3. Taitung / Chishang -->
+              <g class="cursor-pointer group" onclick="selectBase('taitung')">
+                <circle cx="235" cy="385" r="12" fill="#10b981" fill-opacity="0.2" class="pulse-pin" />
+                <circle cx="235" cy="385" r="6" fill="#10b981" stroke="#ffffff" stroke-width="2" />
+                <text x="248" y="388" font-size="12" font-weight="bold" fill="currentColor" class="select-none">Taitung (3N)</text>
+                <text x="248" y="401" font-size="10" fill="var(--muted-foreground)" class="select-none">Rice Fields & Coast</text>
+              </g>
+
+              <!-- 4. Kaohsiung -->
+              <g class="cursor-pointer group" onclick="selectBase('kaohsiung')">
+                <circle cx="155" cy="420" r="12" fill="#f59e0b" fill-opacity="0.2" class="pulse-pin" />
+                <circle cx="155" cy="420" r="6" fill="#f59e0b" stroke="#ffffff" stroke-width="2" />
+                <text x="75" y="424" font-size="12" font-weight="bold" fill="currentColor" class="select-none">Kaohsiung (2N)</text>
+                <text x="85" y="437" font-size="10" fill="var(--muted-foreground)" class="select-none">Harbor Art</text>
+              </g>
+
+              <!-- 5. Tainan -->
+              <g class="cursor-pointer group" onclick="selectBase('tainan')">
+                <circle cx="138" cy="365" r="12" fill="#06b6d4" fill-opacity="0.2" class="pulse-pin" />
+                <circle cx="138" cy="365" r="6" fill="#06b6d4" stroke="#ffffff" stroke-width="2" />
+                <text x="65" y="368" font-size="12" font-weight="bold" fill="currentColor" class="select-none">Tainan (3N)</text>
+                <text x="65" y="381" font-size="10" fill="var(--muted-foreground)" class="select-none">Food Capital</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Legend -->
+          <div class="mt-4 pt-4 border-t border-[var(--border)] flex flex-wrap gap-x-4 gap-y-2 text-xs text-[var(--muted-foreground)]">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-1 bg-[#3b82f6] rounded"></span> <span>TRA Coastal</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-1 bg-[#10b981] rounded"></span> <span>TRA Rift Valley</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-1 bg-[#f59e0b] rounded"></span> <span>TRA South-Link</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-1 bg-[#8b5cf6] rounded border-b border-dashed"></span> <span>THSR High-Speed</span>
             </div>
           </div>
         </div>
 
-        <div class="day-card" data-stop="taipei-start">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 2</span>
-                <span class="text-sm font-medium">Nov 14 (Fri)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taipei [Booked]</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Urban & Sunset</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Historic Shophouses & Skyline Dusk</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Wander Dadaocheng / Dihua Street’s vintage tea courtyards, followed by sunset over the metropolis.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-amber-500">Morning:</strong> Dihua Street — heritage shophouses, herbal apothecaries, specialty oolong tea tasting.</div>
-              <div><strong class="text-blue-500">Afternoon:</strong> Songshan Cultural & Creative Park + indie cafe hopping in Fujin Street.</div>
-              <div><strong class="text-purple-500">Dusk:</strong> Elephant Mountain (easy 20-min stair climb for the iconic Taipei 101 skyline) + Raohe Night Market pepper buns.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="taipei-start">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 3</span>
-                <span class="text-sm font-medium">Nov 15 (Sat)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taipei [Booked]</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Tea Hills</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Creative Hubs & Tea Plantation Cable Car</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Explore converted sake factory galleries and ride a glass-floor gondola into misty tea mountains.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-amber-500">Morning:</strong> Huashan 1914 Creative Park & Yongkang Street (scallion pancakes, mango ice, boutique stationery).</div>
-              <div><strong class="text-blue-500">Afternoon:</strong> Maokong Gondola up to mountain tea plantations. Enjoy cliffside Tieguanyin tea overlooking Taipei valley.</div>
-              <div><strong class="text-purple-500">Evening:</strong> Shida student cafe & boutique quarter or quiet dinner in Daan.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stop 2: Hualien -->
-        <div class="day-card" data-stop="hualien">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">Day 4</span>
-                <span class="text-sm font-medium">Nov 16 (Sun)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Hualien (Night 1)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-semibold">Scenic Rail Leg 1</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Pacific Coastal Rail & Pebble Beach</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Board the express train cutting between towering cliffs and the azure Pacific Ocean.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-purple-500">Transit:</strong> TRA Express (EMU3000/Puyuma) from Taipei to Hualien (~2 hrs). <em>Book in advance!</em></div>
-              <div><strong class="text-blue-500">Afternoon:</strong> Check in, taxi or bike to <strong>Qixingtan Beach</strong> — relax listening to ocean waves rolling smooth marble pebbles.</div>
-              <div><strong class="text-amber-500">Night:</strong> <strong>Dongdamen Night Market</strong> — wide open coastal market featuring indigenous roasted pork, scallion wraps, and lemon tea.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="hualien">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">Day 5</span>
-                <span class="text-sm font-medium">Nov 17 (Mon)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Hualien (Night 2)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Coastal Calm</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Cypress Groves & Oceanfront Cafes</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Historic military quarters nestled under giant pine trees and leisurely Pacific cafe lounging.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-blue-500">Day:</strong> Visit Pine Garden (1940s Japanese military headquarter in a tranquil grove) + General Hall cultural quarters.</div>
-              <div><strong class="text-amber-500">Food:</strong> Gongzheng steamed pork buns & legendary Dai Ji delicate wontons.</div>
-              <div><strong class="text-purple-500">Afternoon:</strong> Relax at a seaside cafe along the coastal promenade.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stop 3: Taitung & Chishang -->
-        <div class="day-card" data-stop="taitung">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Day 6</span>
-                <span class="text-sm font-medium">Nov 18 (Tue)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taitung (Night 1)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-semibold">Scenic Rail Leg 2</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">East Rift Valley Rail & Lantern Village</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Train ride between the Central and Coastal mountain ranges into Taiwan’s most laid-back county.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-purple-500">Transit:</strong> TRA Valley Express to Taitung Station (~1.5–2 hrs).</div>
-              <div><strong class="text-emerald-500">Evening:</strong> <strong>Tiehua Music Village</strong> — stroll among hundreds of hand-painted glowing hot-air-balloon lanterns, acoustic live performances, and local craft booths.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="taitung">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Day 7</span>
-                <span class="text-sm font-medium">Nov 19 (Wed)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taitung (Night 2)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-amber-500 font-semibold">🌾 Highlight</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Chishang Golden Rice Field E-Biking</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Rent electric bicycles and glide along Mr. Brown Avenue through boundless golden paddy fields.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-blue-500">Day Trip:</strong> 40-min easy train up to Chishang (no luggage to carry!).</div>
-              <div><strong class="text-emerald-500">Activity:</strong> Cycle through <strong>Mr. Brown Avenue (Bolang Dadao)</strong> with dramatic mountain backdrops. November is harvest time!</div>
-              <div><strong class="text-amber-500">Lunch:</strong> Traditional Chishang Wooden Box Bento featuring award-winning valley rice and braised pork.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="taitung">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Day 8</span>
-                <span class="text-sm font-medium">Nov 20 (Thu)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taitung (Night 3)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Bohemian Coast</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Dulan Artist Village & Ocean Breeze</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Bohemian indie art community, craft beer, ocean views, and indigenous culture.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-emerald-500">Day:</strong> Coastal bus or taxi to <strong>Dulan Sugar Factory</strong> (artist workshops, indie coffee, indigenous woodcraft).</div>
-              <div><strong class="text-blue-500">Coast:</strong> Enjoy coastal view stops along Jiamuzi Bay and taste fresh Donghe steamed buns.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stop 4: Kaohsiung -->
-        <div class="day-card" data-stop="kaohsiung">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">Day 9</span>
-                <span class="text-sm font-medium">Nov 21 (Fri)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Kaohsiung (Night 1)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-semibold">Scenic Rail Leg 3</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">South-Link Train & Pier-2 Harbor Art</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Cross the southern mountain pass to Taiwan’s bustling harbor city.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-purple-500">Transit:</strong> TRA South-Link Scenic Train (~2 hrs) to Kaohsiung Main Station.</div>
-              <div><strong class="text-amber-500">Afternoon:</strong> Check in at Yancheng District. Walk the sprawling <strong>Pier-2 Art Center</strong> warehouses, giant murals, and rotating Great Harbor Bridge.</div>
-              <div><strong class="text-blue-500">Dinner:</strong> Famous Yancheng Duck Rice (Ya Rou Zhen) or craft beer at KW2 harbor warehouse.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="kaohsiung">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">Day 10</span>
-                <span class="text-sm font-medium">Nov 22 (Sat)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Kaohsiung (Night 2)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Maritime Day</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Cijin Island Ferry & Bay Light Rail</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              5-minute ferry hop to a barrier island for lighthouses, coastal breeze, and fresh seafood.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-blue-500">Morning:</strong> Ferry to Cijin Island. Walk up to the Kaohsiung Lighthouse cafe for panoramic harbor views, then sample grilled squid along Seafood Old Street.</div>
-              <div><strong class="text-amber-500">Afternoon:</strong> Ride the circular Light Rail around the bay; stop at Weiwuying Street Art Village.</div>
-              <div><strong class="text-purple-500">Evening:</strong> Lively Ruifeng Night Market (angel chicken cutlets, bubble tea).</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stop 5: Tainan -->
-        <div class="day-card" data-stop="tainan">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">Day 11</span>
-                <span class="text-sm font-medium">Nov 23 (Sun)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Tainan (Night 1)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-500 font-semibold">Easy Transit Leg</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Arrive in Taiwan's Culinary Heartland</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Quick 30-min train to Taiwan's oldest city, famed for lantern-lit lanes and endless street delicacies.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-purple-500">Transit:</strong> Local TRA train from Kaohsiung to Tainan (~30 mins, no advance ticket needed, tap EasyCard).</div>
-              <div><strong class="text-cyan-500">Afternoon:</strong> Check into West Central District. Stroll <strong>Shennong Street</strong> — 300-year-old shophouses now housing cozy cafes, leathercraft, and cocktail bars.</div>
-              <div><strong class="text-amber-500">Food Crawl:</strong> Guohua Street for savory rice pudding (*wa gui*) and Danzai noodles.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="tainan">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">Day 12</span>
-                <span class="text-sm font-medium">Nov 24 (Mon)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Tainan (Night 2)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Heritage & Beef Soup</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Banyan Treehouse & Legendary Beef Soup</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Dutch colonial fortresses, banyans reclaiming old warehouses, and Michelin-starred breakfast bowls.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-amber-500">Breakfast:</strong> Traditional fresh Tainan beef soup (flash-boiled by pouring hot broth over fresh sliced local beef).</div>
-              <div><strong class="text-cyan-500">Morning:</strong> Anping Old Fort & Anping Treehouse (massive banyan aerial roots swallowing 19th-century brick warehouses).</div>
-              <div><strong class="text-purple-500">Afternoon:</strong> Specialty coffee crawl through Tainan’s residential alleyways (Paripari apt.).</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="tainan">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">Day 13</span>
-                <span class="text-sm font-medium">Nov 25 (Tue)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Tainan (Night 3)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Design & Nightlife</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Modern Art, Vintage Department Stores & Speakeasies</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Stunning modern architecture, 1930s Japanese nostalgia, and hidden alleyway cocktail lounges.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-cyan-500">Morning:</strong> Tainan Art Museum (Building 2, iconic white geometric design) + Hayashi Department Store (vintage dial elevator).</div>
-              <div><strong class="text-blue-500">Afternoon:</strong> Sicao Green Tunnel mini-boat cruise through lush mangrove canopy.</div>
-              <div><strong class="text-purple-500">Night:</strong> World-class alleyway speakeasies: Bar Home or Moonrock.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stop 6: Taipei Finale -->
-        <div class="day-card" data-stop="taipei-end">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 14</span>
-                <span class="text-sm font-medium">Nov 26 (Wed)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taipei Finale (Night 1)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-purple-500/10 text-purple-500 font-semibold">High-Speed Rail</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Bullet Train North & Chifeng Hipster Quarters</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              High-Speed Rail whisks you from south to north in just 85 minutes.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-purple-500">Transit:</strong> Taiwan High-Speed Rail (THSR) Tainan to Taipei (~85 mins, 300 km/h).</div>
-              <div><strong class="text-blue-500">Afternoon:</strong> Check into Zhongshan District. Explore <strong>Chifeng Street</strong> — vintage auto-repair alleys now filled with design boutiques and specialty coffee roasters.</div>
-              <div><strong class="text-amber-500">Night:</strong> Tonghua (Linjiang) Night Market for pan-fried pork buns and shaved ice.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="taipei-end">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 15</span>
-                <span class="text-sm font-medium">Nov 27 (Thu)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taipei Finale (Night 2)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-emerald-500 font-semibold">♨️ Thermal Day</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Beitou Thermal Hot Springs & Tamsui River Sunset</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Unwind in natural sulfur hot springs and watch sunset where the river meets the sea.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-emerald-500">Morning:</strong> Red MRT Line to <strong>Beitou</strong>. Soak in private or public hot spring baths, visit Thermal Valley steam springs, and marvel at the wooden Beitou Eco-Library.</div>
-              <div><strong class="text-blue-500">Late Afternoon:</strong> MRT to Tamsui riverfront promenade for golden sunset and iron eggs.</div>
-              <div><strong class="text-purple-500">Dinner:</strong> Taiwanese Mala spicy hotpot feast.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="taipei-end">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 16</span>
-                <span class="text-sm font-medium">Nov 28 (Fri)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Taipei Finale (Night 3)</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Souvenirs & Farewell</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Traditional Breakfast & Gift Haul</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Warm sesame flatbreads, high-mountain oolong tea shopping, and a farewell banquet.
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-amber-500">Morning:</strong> Traditional savory soy milk & youtiao at Fuhang Soy Milk.</div>
-              <div><strong class="text-purple-500">Day:</strong> Gift hunting: SunnyHills / Chia Te pineapple cakes, Taiwan craft tea tins, and design stationery.</div>
-              <div><strong class="text-blue-500">Evening:</strong> Farewell dinner at Din Tai Fung (xiao long bao) or Taipei craft beer taproom.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="day-card" data-stop="taipei-end">
-          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
-            <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 17</span>
-                <span class="text-sm font-medium">Nov 29 (Sat)</span>
-                <span class="text-xs text-[var(--muted-foreground)]">• Departure</span>
-              </div>
-              <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Flight Home</span>
-            </div>
-            <h4 class="font-bold text-base mb-1">Smooth Airport Transit & Flight to Berlin</h4>
-            <p class="text-sm text-[var(--muted-foreground)] mb-3">
-              Direct Airport Express MRT from Taipei Main Station back to Taoyuan (TPE).
-            </p>
-            <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
-              <div><strong class="text-blue-500">Transit:</strong> Taoyuan Airport MRT Express (35 mins). In-town check-in available at Taipei Main Station for select airlines!</div>
-            </div>
+        <!-- Quick Navigation Buttons -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-sm">
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] mb-3">Jump to Stop</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2 text-xs">
+            <button onclick="selectBase('all')" id="btn-all" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
+              🌟 All 16 Days
+            </button>
+            <button onclick="selectBase('taipei-start')" id="btn-taipei-start" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
+              🏙️ 1. Taipei (D1–3)
+            </button>
+            <button onclick="selectBase('hualien')" id="btn-hualien" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
+              🌊 2. Hualien (D4–5)
+            </button>
+            <button onclick="selectBase('taitung')" id="btn-taitung" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
+              🌾 3. Taitung (D6–8)
+            </button>
+            <button onclick="selectBase('kaohsiung')" id="btn-kaohsiung" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
+              ⚓ 4. Kaohsiung (D9–10)
+            </button>
+            <button onclick="selectBase('tainan')" id="btn-tainan" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
+              🍜 5. Tainan (D11–13)
+            </button>
+            <button onclick="selectBase('taipei-end')" id="btn-taipei-end" class="base-btn px-3 py-2 rounded-lg text-left font-medium bg-[var(--background)] hover:bg-[var(--accent)] text-[var(--foreground)] border border-[var(--border)] transition">
+              ♨️ 6. Taipei Finale (D14–17)
+            </button>
           </div>
         </div>
 
       </div>
 
-      <!-- VIEW 2: HOTELS / NEIGHBORHOODS -->
-      <div id="view-hotels" class="hidden flex-col gap-4">
-        
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="p-2 rounded-xl bg-purple-500/10 text-purple-500 text-lg">🏙️</span>
-            <div>
-              <h3 class="font-bold text-base">Taipei Part 1 (Nov 13–16, 3 Nights)</h3>
-              <p class="text-xs text-emerald-500 font-medium">Status: Hotel Already Booked</p>
-            </div>
-          </div>
-          <p class="text-sm text-[var(--muted-foreground)]">
-            Ideal base to unpack, shake off jetlag, explore Dadaocheng, Yongkang Street, and vibrant night markets.
-          </p>
+      <!-- Right Column: Itinerary Feed & Feature Tabs (7 cols) -->
+      <div class="lg:col-span-7 flex flex-col gap-6">
+
+        <!-- Sub-Tabs: Itinerary vs Hotels vs Food vs Logistics -->
+        <div class="flex items-center gap-2 p-1 bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-x-auto scrollbar-thin">
+          <button onclick="switchView('itinerary')" id="tab-itinerary" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--accent)] text-[var(--foreground)] transition whitespace-nowrap">
+            📅 Day-by-Day Plan
+          </button>
+          <button onclick="switchView('hotels')" id="tab-hotels" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">
+            🏨 Neighborhoods & Hotels
+          </button>
+          <button onclick="switchView('food')" id="tab-food" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">
+            🍜 Food & Cafe Radar
+          </button>
+          <button onclick="switchView('trains')" id="tab-trains" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition whitespace-nowrap">
+            🚄 Train Booking Guide
+          </button>
         </div>
 
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="p-2 rounded-xl bg-blue-500/10 text-blue-500 text-lg">🌊</span>
-            <div>
-              <h3 class="font-bold text-base">Hualien (Nov 16–18, 2 Nights)</h3>
-              <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>Hualien City Center / Golden Triangle</strong></p>
+        <!-- VIEW 1: ITINERARY -->
+        <div id="view-itinerary" class="flex flex-col gap-4">
+
+          <!-- Stop 1: Taipei Arrival -->
+          <div class="day-card" data-stop="taipei-start">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 1</span>
+                  <span class="text-sm font-medium">Nov 13 (Thu)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taipei [Booked]</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Arrival</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Touchdown Taipei & First Night Bites</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Land at Taoyuan (TPE), take the Airport Express MRT directly to Taipei Main Station, and check in.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-amber-500">Evening:</strong> Relaxed stroll through <strong>Ningxia Night Market</strong>. Try Liu Yu Zi fried taro balls & fresh oyster omelet.</div>
+                <div><strong class="text-blue-500">Transit:</strong> Taoyuan Airport MRT Express (35 mins) — tap EasyCard.</div>
+              </div>
             </div>
           </div>
-          <p class="text-sm text-[var(--muted-foreground)] mb-3">
-            Stay around Zhongshan Rd & Zhongzheng Rd. Walk out your door to dumplings, cafes, bakeries, and a 10-minute walk to Dongdamen Night Market.
-          </p>
-          <div class="text-xs bg-[var(--background)] p-3 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)]">
-            💡 <em>Alternative:</em> Staying right beside Hualien Station is great if you want instant check-in straight off the train.
+
+          <div class="day-card" data-stop="taipei-start">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 2</span>
+                  <span class="text-sm font-medium">Nov 14 (Fri)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taipei [Booked]</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Urban & Sunset</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Historic Shophouses & Skyline Dusk</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Wander Dadaocheng / Dihua Street’s vintage tea courtyards, followed by sunset over the metropolis.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-amber-500">Morning:</strong> Dihua Street — heritage shophouses, herbal apothecaries, specialty oolong tea tasting.</div>
+                <div><strong class="text-blue-500">Afternoon:</strong> Songshan Cultural & Creative Park + indie cafe hopping in Fujin Street.</div>
+                <div><strong class="text-purple-500">Dusk:</strong> Elephant Mountain (easy 20-min stair climb for the iconic Taipei 101 skyline) + Raohe Night Market pepper buns.</div>
+              </div>
+            </div>
           </div>
+
+          <div class="day-card" data-stop="taipei-start">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 3</span>
+                  <span class="text-sm font-medium">Nov 15 (Sat)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taipei [Booked]</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Tea Hills</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Creative Hubs & Tea Plantation Cable Car</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Explore converted sake factory galleries and ride a glass-floor gondola into misty tea mountains.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-amber-500">Morning:</strong> Huashan 1914 Creative Park & Yongkang Street (scallion pancakes, mango ice, boutique stationery).</div>
+                <div><strong class="text-blue-500">Afternoon:</strong> Maokong Gondola up to mountain tea plantations. Enjoy cliffside Tieguanyin tea overlooking Taipei valley.</div>
+                <div><strong class="text-purple-500">Evening:</strong> Shida student cafe & boutique quarter or quiet dinner in Daan.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stop 2: Hualien -->
+          <div class="day-card" data-stop="hualien">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">Day 4</span>
+                  <span class="text-sm font-medium">Nov 16 (Sun)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Hualien (Night 1)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-semibold">Scenic Rail Leg 1</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Pacific Coastal Rail & Pebble Beach</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Board the express train cutting between towering cliffs and the azure Pacific Ocean.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-purple-500">Transit:</strong> TRA Express (EMU3000/Puyuma) from Taipei to Hualien (~2 hrs). <em>Book in advance!</em></div>
+                <div><strong class="text-blue-500">Afternoon:</strong> Check in, taxi or bike to <strong>Qixingtan Beach</strong> — relax listening to ocean waves rolling smooth marble pebbles.</div>
+                <div><strong class="text-amber-500">Night:</strong> <strong>Dongdamen Night Market</strong> — wide open coastal market featuring indigenous roasted pork, scallion wraps, and lemon tea.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="hualien">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">Day 5</span>
+                  <span class="text-sm font-medium">Nov 17 (Mon)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Hualien (Night 2)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Coastal Calm</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Cypress Groves & Oceanfront Cafes</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Historic military quarters nestled under giant pine trees and leisurely Pacific cafe lounging.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-blue-500">Day:</strong> Visit Pine Garden (1940s Japanese military headquarter in a tranquil grove) + General Hall cultural quarters.</div>
+                <div><strong class="text-amber-500">Food:</strong> Gongzheng steamed pork buns & legendary Dai Ji delicate wontons.</div>
+                <div><strong class="text-purple-500">Afternoon:</strong> Relax at a seaside cafe along the coastal promenade.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stop 3: Taitung & Chishang -->
+          <div class="day-card" data-stop="taitung">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Day 6</span>
+                  <span class="text-sm font-medium">Nov 18 (Tue)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taitung (Night 1)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-semibold">Scenic Rail Leg 2</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">East Rift Valley Rail & Lantern Village</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Train ride between the Central and Coastal mountain ranges into Taiwan’s most laid-back county.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-purple-500">Transit:</strong> TRA Valley Express to Taitung Station (~1.5–2 hrs).</div>
+                <div><strong class="text-emerald-500">Evening:</strong> <strong>Tiehua Music Village</strong> — stroll among hundreds of hand-painted glowing hot-air-balloon lanterns, acoustic live performances, and local craft booths.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="taitung">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Day 7</span>
+                  <span class="text-sm font-medium">Nov 19 (Wed)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taitung (Night 2)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-amber-500 font-semibold">🌾 Highlight</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Chishang Golden Rice Field E-Biking</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Rent electric bicycles and glide along Mr. Brown Avenue through boundless golden paddy fields.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-blue-500">Day Trip:</strong> 40-min easy train up to Chishang (no luggage to carry!).</div>
+                <div><strong class="text-emerald-500">Activity:</strong> Cycle through <strong>Mr. Brown Avenue (Bolang Dadao)</strong> with dramatic mountain backdrops. November is harvest time!</div>
+                <div><strong class="text-amber-500">Lunch:</strong> Traditional Chishang Wooden Box Bento featuring award-winning valley rice and braised pork.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="taitung">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Day 8</span>
+                  <span class="text-sm font-medium">Nov 20 (Thu)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taitung (Night 3)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Bohemian Coast</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Dulan Artist Village & Ocean Breeze</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Bohemian indie art community, craft beer, ocean views, and indigenous culture.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-emerald-500">Day:</strong> Coastal bus or taxi to <strong>Dulan Sugar Factory</strong> (artist workshops, indie coffee, indigenous woodcraft).</div>
+                <div><strong class="text-blue-500">Coast:</strong> Enjoy coastal view stops along Jiamuzi Bay and taste fresh Donghe steamed buns.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stop 4: Kaohsiung -->
+          <div class="day-card" data-stop="kaohsiung">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">Day 9</span>
+                  <span class="text-sm font-medium">Nov 21 (Fri)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Kaohsiung (Night 1)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-semibold">Scenic Rail Leg 3</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">South-Link Train & Pier-2 Harbor Art</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Cross the southern mountain pass to Taiwan’s bustling harbor city.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-purple-500">Transit:</strong> TRA South-Link Scenic Train (~2 hrs) to Kaohsiung Main Station.</div>
+                <div><strong class="text-amber-500">Afternoon:</strong> Check in at Yancheng District. Walk the sprawling <strong>Pier-2 Art Center</strong> warehouses, giant murals, and rotating Great Harbor Bridge.</div>
+                <div><strong class="text-blue-500">Dinner:</strong> Famous Yancheng Duck Rice (Ya Rou Zhen) or craft beer at KW2 harbor warehouse.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="kaohsiung">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">Day 10</span>
+                  <span class="text-sm font-medium">Nov 22 (Sat)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Kaohsiung (Night 2)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Maritime Day</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Cijin Island Ferry & Bay Light Rail</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                5-minute ferry hop to a barrier island for lighthouses, coastal breeze, and fresh seafood.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-blue-500">Morning:</strong> Ferry to Cijin Island. Walk up to the Kaohsiung Lighthouse cafe for panoramic harbor views, then sample grilled squid along Seafood Old Street.</div>
+                <div><strong class="text-amber-500">Afternoon:</strong> Ride the circular Light Rail around the bay; stop at Weiwuying Street Art Village.</div>
+                <div><strong class="text-purple-500">Evening:</strong> Lively Ruifeng Night Market (angel chicken cutlets, bubble tea).</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stop 5: Tainan -->
+          <div class="day-card" data-stop="tainan">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">Day 11</span>
+                  <span class="text-sm font-medium">Nov 23 (Sun)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Tainan (Night 1)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-500 font-semibold">Easy Transit Leg</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Arrive in Taiwan's Culinary Heartland</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Quick 30-min train to Taiwan's oldest city, famed for lantern-lit lanes and endless street delicacies.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-purple-500">Transit:</strong> Local TRA train from Kaohsiung to Tainan (~30 mins, no advance ticket needed, tap EasyCard).</div>
+                <div><strong class="text-cyan-500">Afternoon:</strong> Check into West Central District. Stroll <strong>Shennong Street</strong> — 300-year-old shophouses now housing cozy cafes, leathercraft, and cocktail bars.</div>
+                <div><strong class="text-amber-500">Food Crawl:</strong> Guohua Street for savory rice pudding (*wa gui*) and Danzai noodles.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="tainan">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">Day 12</span>
+                  <span class="text-sm font-medium">Nov 24 (Mon)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Tainan (Night 2)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Heritage & Beef Soup</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Banyan Treehouse & Legendary Beef Soup</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Dutch colonial fortresses, banyans reclaiming old warehouses, and Michelin-starred breakfast bowls.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-amber-500">Breakfast:</strong> Traditional fresh Tainan beef soup (flash-boiled by pouring hot broth over fresh sliced local beef).</div>
+                <div><strong class="text-cyan-500">Morning:</strong> Anping Old Fort & Anping Treehouse (massive banyan aerial roots swallowing 19th-century brick warehouses).</div>
+                <div><strong class="text-purple-500">Afternoon:</strong> Specialty coffee crawl through Tainan’s residential alleyways (Paripari apt.).</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="tainan">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">Day 13</span>
+                  <span class="text-sm font-medium">Nov 25 (Tue)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Tainan (Night 3)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Design & Nightlife</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Modern Art, Vintage Department Stores & Speakeasies</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Stunning modern architecture, 1930s Japanese nostalgia, and hidden alleyway cocktail lounges.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-cyan-500">Morning:</strong> Tainan Art Museum (Building 2, iconic white geometric design) + Hayashi Department Store (vintage dial elevator).</div>
+                <div><strong class="text-blue-500">Afternoon:</strong> Sicao Green Tunnel mini-boat cruise through lush mangrove canopy.</div>
+                <div><strong class="text-purple-500">Night:</strong> World-class alleyway speakeasies: Bar Home or Moonrock.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stop 6: Taipei Finale -->
+          <div class="day-card" data-stop="taipei-end">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 14</span>
+                  <span class="text-sm font-medium">Nov 26 (Wed)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taipei Finale (Night 1)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-purple-500/10 text-purple-500 font-semibold">High-Speed Rail</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Bullet Train North & Chifeng Hipster Quarters</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                High-Speed Rail whisks you from south to north in just 85 minutes.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-purple-500">Transit:</strong> Taiwan High-Speed Rail (THSR) Tainan to Taipei (~85 mins, 300 km/h).</div>
+                <div><strong class="text-blue-500">Afternoon:</strong> Check into Zhongshan District. Explore <strong>Chifeng Street</strong> — vintage auto-repair alleys now filled with design boutiques and specialty coffee roasters.</div>
+                <div><strong class="text-amber-500">Night:</strong> Tonghua (Linjiang) Night Market for pan-fried pork buns and shaved ice.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="taipei-end">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 15</span>
+                  <span class="text-sm font-medium">Nov 27 (Thu)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taipei Finale (Night 2)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-emerald-500 font-semibold">♨️ Thermal Day</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Beitou Thermal Hot Springs & Tamsui River Sunset</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Unwind in natural sulfur hot springs and watch sunset where the river meets the sea.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-emerald-500">Morning:</strong> Red MRT Line to <strong>Beitou</strong>. Soak in private or public hot spring baths, visit Thermal Valley steam springs, and marvel at the wooden Beitou Eco-Library.</div>
+                <div><strong class="text-blue-500">Late Afternoon:</strong> MRT to Tamsui riverfront promenade for golden sunset and iron eggs.</div>
+                <div><strong class="text-purple-500">Dinner:</strong> Taiwanese Mala spicy hotpot feast.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="taipei-end">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 16</span>
+                  <span class="text-sm font-medium">Nov 28 (Fri)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Taipei Finale (Night 3)</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Souvenirs & Farewell</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Traditional Breakfast & Gift Haul</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Warm sesame flatbreads, high-mountain oolong tea shopping, and a farewell banquet.
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-amber-500">Morning:</strong> Traditional savory soy milk & youtiao at Fuhang Soy Milk.</div>
+                <div><strong class="text-purple-500">Day:</strong> Gift hunting: SunnyHills / Chia Te pineapple cakes, Taiwan craft tea tins, and design stationery.</div>
+                <div><strong class="text-blue-500">Evening:</strong> Farewell dinner at Din Tai Fung (xiao long bao) or Taipei craft beer taproom.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="day-card" data-stop="taipei-end">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400">Day 17</span>
+                  <span class="text-sm font-medium">Nov 29 (Sat)</span>
+                  <span class="text-xs text-[var(--muted-foreground)]">• Departure</span>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded bg-[var(--accent)] text-[var(--muted-foreground)]">Flight Home</span>
+              </div>
+              <h4 class="font-bold text-base mb-1">Smooth Airport Transit & Flight to Berlin</h4>
+              <p class="text-sm text-[var(--muted-foreground)] mb-3">
+                Direct Airport Express MRT from Taipei Main Station back to Taoyuan (TPE).
+              </p>
+              <div class="bg-[var(--background)] rounded-xl p-3 border border-[var(--border)] text-xs flex flex-col gap-1.5">
+                <div><strong class="text-blue-500">Transit:</strong> Taoyuan Airport MRT Express (35 mins). In-town check-in available at Taipei Main Station for select airlines!</div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 text-lg">🌾</span>
-            <div>
-              <h3 class="font-bold text-base">Taitung (Nov 18–21, 3 Nights)</h3>
-              <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>Tiehua Music Village / Old Railway Area</strong></p>
+        <!-- VIEW 2: HOTELS / NEIGHBORHOODS -->
+        <div id="view-hotels" class="hidden flex-col gap-4">
+          
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="p-2 rounded-xl bg-purple-500/10 text-purple-500 text-lg">🏙️</span>
+              <div>
+                <h3 class="font-bold text-base">Taipei Part 1 (Nov 13–16, 3 Nights)</h3>
+                <p class="text-xs text-emerald-500 font-medium">Status: Hotel Already Booked</p>
+              </div>
+            </div>
+            <p class="text-sm text-[var(--muted-foreground)]">
+              Ideal base to unpack, shake off jetlag, explore Dadaocheng, Yongkang Street, and vibrant night markets.
+            </p>
+          </div>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="p-2 rounded-xl bg-blue-500/10 text-blue-500 text-lg">🌊</span>
+              <div>
+                <h3 class="font-bold text-base">Hualien (Nov 16–18, 2 Nights)</h3>
+                <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>Hualien City Center / Golden Triangle</strong></p>
+              </div>
+            </div>
+            <p class="text-sm text-[var(--muted-foreground)] mb-3">
+              Stay around Zhongshan Rd & Zhongzheng Rd. Walk out your door to dumplings, cafes, bakeries, and a 10-minute walk to Dongdamen Night Market.
+            </p>
+            <div class="text-xs bg-[var(--background)] p-3 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)]">
+              💡 <em>Alternative:</em> Staying right beside Hualien Station is great if you want instant check-in straight off the train.
             </div>
           </div>
-          <p class="text-sm text-[var(--muted-foreground)] mb-3">
-            The cultural epicenter of Taitung. At night, acoustic singers and lantern markets fill the park. 
-          </p>
-          <div class="text-xs bg-[var(--background)] p-3 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)]">
-            💡 <em>Day Trip Bonus:</em> You can do the Chishang rice field bike day trip via a quick 40-min scenic train without relocating luggage!
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 text-lg">🌾</span>
+              <div>
+                <h3 class="font-bold text-base">Taitung (Nov 18–21, 3 Nights)</h3>
+                <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>Tiehua Music Village / Old Railway Area</strong></p>
+              </div>
+            </div>
+            <p class="text-sm text-[var(--muted-foreground)] mb-3">
+              The cultural epicenter of Taitung. At night, acoustic singers and lantern markets fill the park. 
+            </p>
+            <div class="text-xs bg-[var(--background)] p-3 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)]">
+              💡 <em>Day Trip Bonus:</em> You can do the Chishang rice field bike day trip via a quick 40-min scenic train without relocating luggage!
+            </div>
           </div>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="p-2 rounded-xl bg-amber-500/10 text-amber-500 text-lg">⚓</span>
+              <div>
+                <h3 class="font-bold text-base">Kaohsiung (Nov 21–23, 2 Nights)</h3>
+                <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>Yancheng District / Pier-2 Art Center</strong></p>
+              </div>
+            </div>
+            <p class="text-sm text-[var(--muted-foreground)] mb-3">
+              Trendy, walkable, harbor-side neighborhood. Steps from the light rail, Great Harbor Bridge, and the Cijin Island ferry terminal.
+            </p>
+          </div>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="p-2 rounded-xl bg-cyan-500/10 text-cyan-500 text-lg">🍜</span>
+              <div>
+                <h3 class="font-bold text-base">Tainan (Nov 23–26, 3 Nights)</h3>
+                <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>West Central District (Zhongxi)</strong></p>
+              </div>
+            </div>
+            <p class="text-sm text-[var(--muted-foreground)] mb-3">
+              Tainan has no subway system, so location is critical! Staying near Shennong Street, Chihkan Tower, or Tainan Art Museum puts 90% of food stalls and indie cafes within walking distance.
+            </p>
+          </div>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="p-2 rounded-xl bg-purple-500/10 text-purple-500 text-lg">🛍️</span>
+              <div>
+                <h3 class="font-bold text-base">Taipei Finale (Nov 26–29, 3 Nights)</h3>
+                <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>Zhongshan District / Chifeng Street</strong></p>
+              </div>
+            </div>
+            <p class="text-sm text-[var(--muted-foreground)] mb-3">
+              Taipei’s premier cafe and design boutique quarter. Direct access to the Red MRT Line (for Beitou Hot Springs & Taipei 101) and just 1 stop from the Taoyuan Airport Express MRT.
+            </p>
+          </div>
+
         </div>
 
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="p-2 rounded-xl bg-amber-500/10 text-amber-500 text-lg">⚓</span>
-            <div>
-              <h3 class="font-bold text-base">Kaohsiung (Nov 21–23, 2 Nights)</h3>
-              <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>Yancheng District / Pier-2 Art Center</strong></p>
+        <!-- VIEW 3: FOOD & CAFE RADAR -->
+        <div id="view-food" class="hidden flex-col gap-4">
+          
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <h3 class="font-bold text-base mb-3 flex items-center gap-2">
+              <span class="text-amber-500">🥟</span> Taipei Food & Cafe Radar
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <span class="font-semibold text-amber-500 block mb-1">Night Market Icons</span>
+                <p class="text-[var(--muted-foreground)]">• Liu Yu Zi fried taro balls (Ningxia)<br>• Fuzhou Pepper Buns (Raohe)<br>• Stinky tofu & oyster omelet</p>
+              </div>
+              <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <span class="font-semibold text-purple-500 block mb-1">Cafe & Tea Culture</span>
+                <p class="text-[var(--muted-foreground)]">• ASW Tea House (Dadaocheng)<br>• Tella Tella Retro Cafe (Chifeng St)<br>• High-mountain Tieguanyin (Maokong)</p>
+              </div>
             </div>
           </div>
-          <p class="text-sm text-[var(--muted-foreground)] mb-3">
-            Trendy, walkable, harbor-side neighborhood. Steps from the light rail, Great Harbor Bridge, and the Cijin Island ferry terminal.
-          </p>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <h3 class="font-bold text-base mb-3 flex items-center gap-2">
+              <span class="text-blue-500">🌊</span> Hualien & Taitung Specialties
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <span class="font-semibold text-blue-500 block mb-1">Hualien Treats</span>
+                <p class="text-[var(--muted-foreground)]">• Gongzheng mini steamed buns<br>• Dai Ji delicate wontons (扁食)<br>• Indigenous wild roast pork & millet wine</p>
+              </div>
+              <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <span class="font-semibold text-emerald-500 block mb-1">Taitung & Chishang</span>
+                <p class="text-[var(--muted-foreground)]">• Chishang Wooden Box Bento (池上便當)<br>• Donghe hot steamed buns<br>• Dulan craft beer & mountain pepper chicken</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <h3 class="font-bold text-base mb-3 flex items-center gap-2">
+              <span class="text-cyan-500">🍲</span> Southern Culinary Capital (Tainan & Kaohsiung)
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <span class="font-semibold text-amber-500 block mb-1">Kaohsiung Harbor</span>
+                <p class="text-[var(--muted-foreground)]">• Yancheng Duck Rice (鴨肉珍)<br>• Cijin grilled squid & fresh catch<br>• KW2 pier coffee with sea breeze</p>
+              </div>
+              <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <span class="font-semibold text-cyan-500 block mb-1">Tainan Holy Grails</span>
+                <p class="text-[var(--muted-foreground)]">• Fresh Beef Soup (morning ritual)<br>• Chou’s shrimp rolls & Danzai noodles<br>• Paripari kissaten & Moonrock speakeasy</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="p-2 rounded-xl bg-cyan-500/10 text-cyan-500 text-lg">🍜</span>
-            <div>
-              <h3 class="font-bold text-base">Tainan (Nov 23–26, 3 Nights)</h3>
-              <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>West Central District (Zhongxi)</strong></p>
+        <!-- VIEW 4: TRAIN BOOKING GUIDE -->
+        <div id="view-trains" class="hidden flex-col gap-4">
+          
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-xl">⚠️</span>
+              <h3 class="font-bold text-base">TRA Express Booking Rule (Crucial)</h3>
+            </div>
+            <p class="text-sm text-[var(--muted-foreground)] mb-4">
+              On the Eastern Line (Taipei ↔ Hualien ↔ Taitung), the fastest trains (<strong>EMU3000, Puyuma, and Taroko Express</strong>) are <strong>Reserved Seat Only</strong>.
+            </p>
+            <div class="space-y-3 text-xs">
+              <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300">
+                <strong>No Standing / No EasyCard Tapping:</strong> You cannot simply swipe an EasyCard to board these express trains. You must have an assigned seat ticket booked in advance.
+              </div>
+              <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <strong>Booking Window:</strong> Tickets open <strong>28 days prior</strong> at 00:00 Taiwan time (UTC+8).
+              </div>
+              <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
+                <strong>Official App:</strong> Download <em>"Taiwan Railway (台鐵e聯網)"</em>. You can book in English with your passport number and get digital QR tickets directly on your phone.
+              </div>
             </div>
           </div>
-          <p class="text-sm text-[var(--muted-foreground)] mb-3">
-            Tainan has no subway system, so location is critical! Staying near Shennong Street, Chihkan Tower, or Tainan Art Museum puts 90% of food stalls and indie cafes within walking distance.
-          </p>
-        </div>
 
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="p-2 rounded-xl bg-purple-500/10 text-purple-500 text-lg">🛍️</span>
-            <div>
-              <h3 class="font-bold text-base">Taipei Finale (Nov 26–29, 3 Nights)</h3>
-              <p class="text-xs text-[var(--muted-foreground)]">Recommended Area: <strong>Zhongshan District / Chifeng Street</strong></p>
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+            <h3 class="font-bold text-base mb-3">Leg-by-Leg Booking Matrix</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)]">
+                    <th class="py-2">Leg</th>
+                    <th class="py-2">Date</th>
+                    <th class="py-2">Train Type</th>
+                    <th class="py-2">Book in Advance?</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--border)]">
+                  <tr>
+                    <td class="py-2.5 font-medium">Taipei → Hualien</td>
+                    <td class="py-2.5 text-[var(--muted-foreground)]">Nov 16 (Sun)</td>
+                    <td class="py-2.5 text-blue-500">TRA Express</td>
+                    <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-red-500/10 text-red-500 font-semibold">Yes (Crucial)</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 font-medium">Hualien → Taitung</td>
+                    <td class="py-2.5 text-[var(--muted-foreground)]">Nov 18 (Tue)</td>
+                    <td class="py-2.5 text-emerald-500">TRA Express</td>
+                    <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-semibold">Yes</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 font-medium">Taitung → Kaohsiung</td>
+                    <td class="py-2.5 text-[var(--muted-foreground)]">Nov 21 (Fri)</td>
+                    <td class="py-2.5 text-amber-500">TRA South-Link</td>
+                    <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-semibold">Yes</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 font-medium">Kaohsiung → Tainan</td>
+                    <td class="py-2.5 text-[var(--muted-foreground)]">Nov 23 (Sun)</td>
+                    <td class="py-2.5 text-cyan-500">Local Train</td>
+                    <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-semibold">No (Tap EasyCard)</span></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 font-medium">Tainan → Taipei</td>
+                    <td class="py-2.5 text-[var(--muted-foreground)]">Nov 26 (Wed)</td>
+                    <td class="py-2.5 text-purple-500">THSR High Speed</td>
+                    <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-semibold">Yes (Early Bird -35%)</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-          <p class="text-sm text-[var(--muted-foreground)] mb-3">
-            Taipei’s premier cafe and design boutique quarter. Direct access to the Red MRT Line (for Beitou Hot Springs & Taipei 101) and just 1 stop from the Taoyuan Airport Express MRT.
-          </p>
+
         </div>
 
       </div>
 
-      <!-- VIEW 3: FOOD & CAFE RADAR -->
-      <div id="view-food" class="hidden flex-col gap-4">
-        
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <h3 class="font-bold text-base mb-3 flex items-center gap-2">
-            <span class="text-amber-500">🥟</span> Taipei Food & Cafe Radar
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-              <span class="font-semibold text-amber-500 block mb-1">Night Market Icons</span>
-              <p class="text-[var(--muted-foreground)]">• Liu Yu Zi fried taro balls (Ningxia)<br>• Fuzhou Pepper Buns (Raohe)<br>• Stinky tofu & oyster omelet</p>
-            </div>
-            <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-              <span class="font-semibold text-purple-500 block mb-1">Cafe & Tea Culture</span>
-              <p class="text-[var(--muted-foreground)]">• ASW Tea House (Dadaocheng)<br>• Tella Tella Retro Cafe (Chifeng St)<br>• High-mountain Tieguanyin (Maokong)</p>
-            </div>
-          </div>
-        </div>
+    </main>
 
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <h3 class="font-bold text-base mb-3 flex items-center gap-2">
-            <span class="text-blue-500">🌊</span> Hualien & Taitung Specialties
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-              <span class="font-semibold text-blue-500 block mb-1">Hualien Treats</span>
-              <p class="text-[var(--muted-foreground)]">• Gongzheng mini steamed buns<br>• Dai Ji delicate wontons (扁食)<br>• Indigenous wild roast pork & millet wine</p>
-            </div>
-            <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-              <span class="font-semibold text-emerald-500 block mb-1">Taitung & Chishang</span>
-              <p class="text-[var(--muted-foreground)]">• Chishang Wooden Box Bento (池上便當)<br>• Donghe hot steamed buns<br>• Dulan craft beer & mountain pepper chicken</p>
-            </div>
-          </div>
-        </div>
+  </div>
 
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <h3 class="font-bold text-base mb-3 flex items-center gap-2">
-            <span class="text-cyan-500">🍲</span> Southern Culinary Capital (Tainan & Kaohsiung)
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-              <span class="font-semibold text-amber-500 block mb-1">Kaohsiung Harbor</span>
-              <p class="text-[var(--muted-foreground)]">• Yancheng Duck Rice (鴨肉珍)<br>• Cijin grilled squid & fresh catch<br>• KW2 pier coffee with sea breeze</p>
-            </div>
-            <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-              <span class="font-semibold text-cyan-500 block mb-1">Tainan Holy Grails</span>
-              <p class="text-[var(--muted-foreground)]">• Fresh Beef Soup (morning ritual)<br>• Chou’s shrimp rolls & Danzai noodles<br>• Paripari kissaten & Moonrock speakeasy</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- VIEW 4: TRAIN BOOKING GUIDE -->
-      <div id="view-trains" class="hidden flex-col gap-4">
-        
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">⚠️</span>
-            <h3 class="font-bold text-base">TRA Express Booking Rule (Crucial)</h3>
-          </div>
-          <p class="text-sm text-[var(--muted-foreground)] mb-4">
-            On the Eastern Line (Taipei ↔ Hualien ↔ Taitung), the fastest trains (<strong>EMU3000, Puyuma, and Taroko Express</strong>) are <strong>Reserved Seat Only</strong>.
-          </p>
-          <div class="space-y-3 text-xs">
-            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300">
-              <strong>No Standing / No EasyCard Tapping:</strong> You cannot simply swipe an EasyCard to board these express trains. You must have an assigned seat ticket booked in advance.
-            </div>
-            <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-              <strong>Booking Window:</strong> Tickets open <strong>28 days prior</strong> at 00:00 Taiwan time (UTC+8).
-            </div>
-            <div class="p-3 rounded-xl bg-[var(--background)] border border-[var(--border)]">
-              <strong>Official App:</strong> Download <em>"Taiwan Railway (台鐵e聯網)"</em>. You can book in English with your passport number and get digital QR tickets directly on your phone.
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
-          <h3 class="font-bold text-base mb-3">Leg-by-Leg Booking Matrix</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)]">
-                  <th class="py-2">Leg</th>
-                  <th class="py-2">Date</th>
-                  <th class="py-2">Train Type</th>
-                  <th class="py-2">Book in Advance?</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y border-[var(--border)]">
-                <tr>
-                  <td class="py-2.5 font-medium">Taipei → Hualien</td>
-                  <td class="py-2.5 text-[var(--muted-foreground)]">Nov 16 (Sun)</td>
-                  <td class="py-2.5 text-blue-500">TRA Express</td>
-                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-red-500/10 text-red-500 font-semibold">Yes (Crucial)</span></td>
-                </tr>
-                <tr>
-                  <td class="py-2.5 font-medium">Hualien → Taitung</td>
-                  <td class="py-2.5 text-[var(--muted-foreground)]">Nov 18 (Tue)</td>
-                  <td class="py-2.5 text-emerald-500">TRA Express</td>
-                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-semibold">Yes</span></td>
-                </tr>
-                <tr>
-                  <td class="py-2.5 font-medium">Taitung → Kaohsiung</td>
-                  <td class="py-2.5 text-[var(--muted-foreground)]">Nov 21 (Fri)</td>
-                  <td class="py-2.5 text-amber-500">TRA South-Link</td>
-                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-semibold">Yes</span></td>
-                </tr>
-                <tr>
-                  <td class="py-2.5 font-medium">Kaohsiung → Tainan</td>
-                  <td class="py-2.5 text-[var(--muted-foreground)]">Nov 23 (Sun)</td>
-                  <td class="py-2.5 text-cyan-500">Local Train</td>
-                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-semibold">No (Tap EasyCard)</span></td>
-                </tr>
-                <tr>
-                  <td class="py-2.5 font-medium">Tainan → Taipei</td>
-                  <td class="py-2.5 text-[var(--muted-foreground)]">Nov 26 (Wed)</td>
-                  <td class="py-2.5 text-purple-500">THSR High Speed</td>
-                  <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 font-semibold">Yes (Early Bird -35%)</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-  </main>
-
+  <!-- Script for Authentication & Views -->
   <script>
+    // SHA-256 Hash of "2002"
+    const TARGET_HASH = "6c94e35ccc352d4e9ef0b99562cff995a5741ce8de8ad11b568892934daee366";
+    let enteredPin = "";
+
+    // Check existing auth on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const isAuth = localStorage.getItem('taiwan_trip_pin_auth') || sessionStorage.getItem('taiwan_trip_pin_auth');
+      if (isAuth === 'granted') {
+        unlockView();
+      }
+    });
+
+    // Keyboard support
+    window.addEventListener('keydown', (e) => {
+      if (document.getElementById('pin-screen').classList.contains('hidden')) return;
+      if (e.key >= '0' && e.key <= '9') {
+        pressDigit(e.key);
+      } else if (e.key === 'Backspace') {
+        deleteDigit();
+      } else if (e.key === 'Escape') {
+        clearPin();
+      }
+    });
+
+    function pressDigit(digit) {
+      if (enteredPin.length >= 4) return;
+      enteredPin += digit;
+      updateDots();
+      if (enteredPin.length === 4) {
+        setTimeout(verifyAndUnlock, 150);
+      }
+    }
+
+    function deleteDigit() {
+      if (enteredPin.length > 0) {
+        enteredPin = enteredPin.slice(0, -1);
+        updateDots();
+        clearError();
+      }
+    }
+
+    function clearPin() {
+      enteredPin = "";
+      updateDots();
+      clearError();
+    }
+
+    function updateDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i < enteredPin.length) {
+          dot.classList.add('bg-emerald-500', 'border-emerald-500', 'scale-110');
+          dot.classList.remove('border-[var(--border)]');
+        } else {
+          dot.classList.remove('bg-emerald-500', 'border-emerald-500', 'scale-110');
+          dot.classList.add('border-[var(--border)]');
+        }
+      }
+    }
+
+    async function hashString(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function verifyAndUnlock() {
+      const currentHash = await hashString(enteredPin);
+      if (currentHash === TARGET_HASH) {
+        const remember = document.getElementById('remember-me').checked;
+        if (remember) {
+          localStorage.setItem('taiwan_trip_pin_auth', 'granted');
+        } else {
+          sessionStorage.setItem('taiwan_trip_pin_auth', 'granted');
+        }
+        unlockView();
+      } else {
+        showError();
+      }
+    }
+
+    function unlockView() {
+      document.getElementById('pin-screen').classList.add('hidden');
+      document.getElementById('trip-content').classList.remove('hidden');
+    }
+
+    function lockPage() {
+      localStorage.removeItem('taiwan_trip_pin_auth');
+      sessionStorage.removeItem('taiwan_trip_pin_auth');
+      enteredPin = "";
+      updateDots();
+      clearError();
+      document.getElementById('trip-content').classList.add('hidden');
+      document.getElementById('pin-screen').classList.remove('hidden');
+    }
+
+    function showError() {
+      const card = document.getElementById('pin-card');
+      const err = document.getElementById('pin-error');
+      card.classList.add('shake-anim');
+      err.classList.remove('opacity-0');
+      setTimeout(() => {
+        card.classList.remove('shake-anim');
+        clearPin();
+      }, 500);
+    }
+
+    function clearError() {
+      document.getElementById('pin-error').classList.add('opacity-0');
+    }
+
     // Tab switching logic
     function switchView(viewName) {
       const views = ['itinerary', 'hotels', 'food', 'trains'];
@@ -864,13 +1043,11 @@
 
     // Base filter logic
     function selectBase(stop) {
-      // Ensure we are in the itinerary tab
       switchView('itinerary');
 
       const cards = document.querySelectorAll('.day-card');
       const buttons = document.querySelectorAll('.base-btn');
 
-      // Update button styles
       buttons.forEach(btn => {
         btn.classList.remove('bg-[var(--accent)]');
         btn.classList.add('bg-[var(--background)]');
@@ -882,7 +1059,6 @@
         activeBtn.classList.remove('bg-[var(--background)]');
       }
 
-      // Filter cards
       cards.forEach(card => {
         const cardStop = card.getAttribute('data-stop');
         if (stop === 'all') {
